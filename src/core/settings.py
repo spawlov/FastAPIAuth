@@ -12,7 +12,7 @@ class APISettings(BaseModel):
 
 
 class DBSettings(BaseModel):
-    url: str = "sqlite+aiosqlite://./sqlite.db"
+    url: str = "sqlite+aiosqlite:///./sqlite.db"
     echo: bool = False
     echo_pool: bool = False
     pool_size: bool = 5
