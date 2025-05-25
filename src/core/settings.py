@@ -19,7 +19,13 @@ class DBSettings(BaseModel):
     max_overflow: int = 10
 
 
+class RunSettings(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+
 class AppSettings(BaseSettings):
+    run: RunSettings = RunSettings()
     db: DBSettings
     api: APISettings = APISettings()
 
