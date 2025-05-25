@@ -11,8 +11,16 @@ class APISettings(BaseModel):
     v1: APIV1Settings = APIV1Settings()
 
 
-class AppSettings(BaseSettings):
+class DBSettings(BaseModel):
+    url: str = "sqlite+aiosqlite://./sqlite.db"
+    echo: bool = False
+    echo_pool: bool = False
+    pool_size: bool = 5
+    max_overflow: bool = 10
 
+
+class AppSettings(BaseSettings):
+    db: DBSettings = DBSettings()
     api: APISettings = APISettings()
 
     model_config = SettingsConfigDict(
