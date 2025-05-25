@@ -12,20 +12,20 @@ class APISettings(BaseModel):
 
 
 class DBSettings(BaseModel):
-    url: str = "sqlite+aiosqlite:///./sqlite.db"
+    url: str
     echo: bool = False
     echo_pool: bool = False
-    pool_size: bool = 5
-    max_overflow: bool = 10
+    pool_size: int = 5
+    max_overflow: int = 10
 
 
 class AppSettings(BaseSettings):
-    db: DBSettings = DBSettings()
+    db: DBSettings
     api: APISettings = APISettings()
 
     model_config = SettingsConfigDict(
         case_sensitive=False,
-        env_file=".env, .env.dev, .env.prod, .env.test",
+        env_file=(".env", ".env.dev", ".env.prod", ".env.test"),
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
         env_prefix="APP__",
