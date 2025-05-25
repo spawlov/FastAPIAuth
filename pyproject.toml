@@ -13,6 +13,7 @@ pydantic = {extras = ["email"], version = "^2.11.5"}
 pydantic-settings = "^2.9.1"
 alembic = "^1.16.1"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.41"}
+aiosqlite = "^0.21.0"
 
 
 [tool.poetry.group.dev.dependencies]
