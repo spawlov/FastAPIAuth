@@ -14,6 +14,9 @@ pydantic-settings = "^2.9.1"
 alembic = "^1.16.1"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.41"}
 aiosqlite = "^0.21.0"
+argon2-cffi = "^23.1.0"
+pyjwt = {extras = ["crypto"], version = "^2.10.1"}
+python-multipart = "^0.0.20"
 
 
 [tool.poetry.group.dev.dependencies]

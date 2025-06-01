@@ -1,5 +1,20 @@
+import logging
+from pathlib import Path
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+class AuthJWT(BaseModel):
+    token_url: str = "/api/v1/auth/login"
+    algorithm: str = "RS256"
+    private_key: str = Path(BASE_DIR / "certs/jwt-private.pem").read_text()
+    public_key: str = Path(BASE_DIR / "certs/jwt-public.pem").read_text()
+    exp_minutes: int = 15
 
 
 class APIV1Settings(BaseModel):
@@ -25,9 +40,10 @@ class RunSettings(BaseModel):
 
 
 class AppSettings(BaseSettings):
-    run: RunSettings = RunSettings()
-    db: DBSettings
     api: APISettings = APISettings()
+    auth_jwt: AuthJWT = AuthJWT()
+    db: DBSettings
+    run: RunSettings = RunSettings()
 
     model_config = SettingsConfigDict(
         case_sensitive=False,

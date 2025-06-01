@@ -1,10 +1,8 @@
-from typing import Dict
-
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 
 
-def get_naming_convention() -> Dict[str, str]:
+def get_naming_convention() -> dict[str, str]:
     conventions = {
         "ix": "ix_%(column_0_label)s",
         "uq": "uq_%(table_name)s_%(column_0_name)s",

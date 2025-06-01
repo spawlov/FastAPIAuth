@@ -1,7 +1,7 @@
 from .base import Base
-from .test import Test
+from .user import User
 
 __all__ = [
     "Base",
-    "Test",
+    "User",
 ]

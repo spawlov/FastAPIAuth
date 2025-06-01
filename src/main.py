@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -6,6 +7,9 @@ from fastapi import FastAPI
 
 from api import router as api_router
 from core.settings import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
