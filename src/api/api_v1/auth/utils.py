@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from core.settings import settings
-from crud.auth import create_jwt_record
+from crud.auth import create_jwt_record, is_token_revoked
 
 logger = logging.getLogger(__name__)
 
@@ -126,10 +126,16 @@ def get_current_token_payload(
     return payload
 
 
-def get_user_id(
+async def get_user_id(
+    session: AsyncSession,
     token_payload: dict[str, Any],
     expect_token_type: str,
 ) -> int:
+    if await is_token_revoked(session, token_payload.get("jti")):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token revoked",
+        )
     if (current_token_type := token_payload.get("type")) != expect_token_type:
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,

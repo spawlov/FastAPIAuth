@@ -15,6 +15,12 @@ from core.models import User, TokenBlacklist
 
 logger = logging.getLogger(__name__)
 
+# Добавляем кэш для хранения отозванных токенов (заменить на Redis в продакшене)
+REVOKED_TOKENS_CACHE = set()
+
+# Добавляем кэш для отслеживания неудачных попыток входа (по IP)
+FAILED_LOGIN_ATTEMPTS = {}
+
 security = HTTPBasic()
 ph = PasswordHasher()
 
@@ -94,4 +100,54 @@ async def create_jwt_record(
         created_at=datetime.now(timezone.utc),
     )
     session.add(jwt_record)
+    await session.commit()
+
+
+async def is_token_revoked(
+    session: AsyncSession,
+    token_jti: str,
+) -> bool:
+    if token_jti in REVOKED_TOKENS_CACHE:
+        return True
+    stmt = select(TokenBlacklist).where(TokenBlacklist.jti == token_jti)
+    blacklisted = await session.scalar(stmt)
+    if blacklisted and blacklisted.reason:
+        return True
+    return False
+
+
+async def revoke_token(
+    session: AsyncSession,
+    token_jti: str,
+    reason: str = "user_logout",
+):
+    stmt = select(TokenBlacklist).where(TokenBlacklist.jti == token_jti)
+    token = await session.scalar(stmt)
+    if not token:
+        HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Token(s) not found",
+        )
+    token.reason = reason
+    token.revoked_at = datetime.now(timezone.utc)
+    await session.commit()
+    REVOKED_TOKENS_CACHE.add(token_jti)
+
+
+async def revoke_all_user_tokens(
+    session: AsyncSession,
+    user_id: int,
+    reason: str = "user_logout",
+):
+    stmt = select(TokenBlacklist).where(TokenBlacklist.user_id == user_id)
+    tokens = await session.scalars(stmt)
+    if not tokens:
+        HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tokens not found",
+        )
+    for token in tokens:
+        token.reason = reason
+        token.revoked_at = datetime.now(timezone.utc)
+        REVOKED_TOKENS_CACHE.add(token.jti)
     await session.commit()

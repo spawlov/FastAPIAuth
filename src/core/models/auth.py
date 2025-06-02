@@ -44,9 +44,6 @@ class TokenBlacklist(IdIntPKMixin, Base):
     revoked_at: Mapped[Optional[datetime]] = mapped_column(
         nullable=True,
     )
-    # user: Mapped["User"] = relationship(
-    #     back_populates="revoked_tokens",
-    # )
 
     __table_args__ = (
         Index(
