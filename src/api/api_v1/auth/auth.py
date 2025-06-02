@@ -72,7 +72,7 @@ async def refresh_jwt(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     refresh_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> TokenInfo:
-    user_id = get_user_id(refresh_payload, expect_type="refresh")
+    user_id = get_user_id(refresh_payload, expect_token_type="refresh")
     user = await get_user_by_id(session, user_id)
     jwt_payload = {
         "sub": str(user.id),
@@ -95,6 +95,6 @@ async def me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     access_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> AuthUser:
-    user_id = get_user_id(access_payload, expect_type="access")
+    user_id = get_user_id(access_payload, expect_token_type="access")
     user = await get_user_by_id(session, user_id)
     return AuthUser.model_validate(user)
