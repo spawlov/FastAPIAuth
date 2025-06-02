@@ -4,12 +4,14 @@ from datetime import timedelta, datetime, timezone
 from typing import Any
 
 import jwt
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from core.settings import settings
+from crud.auth import create_jwt_record
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +23,7 @@ oauth2_scheme = OAuth2PasswordBearer(
 def encode_jwt(
     payload: dict[str, Any],
     expires_in: timedelta,
+    jti: str,
     private_key: str = settings.auth_jwt.private_key,
     algorithm: str = settings.auth_jwt.algorithm,
 ) -> str:
@@ -28,7 +31,7 @@ def encode_jwt(
     to_encode.update(
         iat=datetime.now(timezone.utc),
         exp=datetime.now(timezone.utc) + expires_in,
-        jti=str(uuid.uuid4()),
+        jti=jti,
     )
     jwt_encoded = jwt.encode(
         to_encode,
@@ -51,34 +54,61 @@ def decode_jwt(
     return jwt_decoded
 
 
-def create_jwt(type_token: str, token_payload: dict[str, Any], expires: int) -> str:
+async def create_jwt(
+    session: AsyncSession,
+    type_token: str,
+    token_payload: dict[str, Any],
+    expires: int,
+    request: Request | None = None,
+) -> str:
     jwt_payload = {
         "type": type_token,
     }
     jwt_payload.update(token_payload)
     expire_in = timedelta(minutes=expires)
+    jti = str(uuid.uuid4())
+    await create_jwt_record(
+        session=session,
+        jti=jti,
+        user_id=token_payload["sub"],
+        token_type=type_token,
+        request=request,
+    )
     return encode_jwt(
         jwt_payload,
         expires_in=expire_in,
+        jti=jti,
     )
 
 
-def get_access_token(jwt_payload: dict[str, Any]) -> str:
-    return create_jwt(
+async def get_access_token(
+    session: AsyncSession,
+    jwt_payload: dict[str, Any],
+    request: Request | None = None,
+) -> str:
+    return await create_jwt(
+        session=session,
         type_token="access",
         token_payload=jwt_payload,
         expires=settings.auth_jwt.access_exp_minutes,
+        request=request,
     )
 
 
-def get_refresh_token(jwt_payload: dict[str, Any]) -> str:
+async def get_refresh_token(
+    session: AsyncSession,
+    jwt_payload: dict[str, Any],
+    request: Request | None = None,
+) -> str:
     payload: dict[str, Any] = {
         "sub": jwt_payload["sub"],
     }
-    return create_jwt(
+    return await create_jwt(
+        session=session,
         type_token="refresh",
         token_payload=payload,
         expires=settings.auth_jwt.refresh_exp_minutes,
+        request=request,
     )
 
 

@@ -7,6 +7,7 @@ from typing import (
 from fastapi import (
     APIRouter,
     Depends,
+    Request,
 )
 from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
 from pydantic import SecretStr
@@ -39,6 +40,7 @@ router = APIRouter(dependencies=[Depends(http_bearer)])
 async def login(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    request: Request,
 ) -> TokenInfo:
     user = await get_auth_user(
         session,
@@ -49,8 +51,8 @@ async def login(
         "sub": str(user.id),
         "username": user.nickname,
     }
-    access_token = get_access_token(jwt_payload)
-    refresh_token = get_refresh_token(jwt_payload)
+    access_token = await get_access_token(session, jwt_payload, request)
+    refresh_token = await get_refresh_token(session, jwt_payload, request)
 
     return TokenInfo(
         access_token=access_token,
@@ -67,6 +69,7 @@ async def login(
 async def refresh_jwt(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     refresh_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
+    request: Request,
 ) -> TokenInfo:
     user_id = get_user_id(refresh_payload, expect_token_type="refresh")
     user = await get_user_by_id(session, user_id)
@@ -74,7 +77,7 @@ async def refresh_jwt(
         "sub": str(user.id),
         "username": user.nickname,
     }
-    access_token = get_access_token(jwt_payload)
+    access_token = await get_access_token(session, jwt_payload, request)
     return TokenInfo(
         access_token=access_token,
     )

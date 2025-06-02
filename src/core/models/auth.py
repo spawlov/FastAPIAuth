@@ -9,15 +9,11 @@ from core.models import Base
 from core.models.mixins.id_int_pk import IdIntPKMixin
 
 
-if TYPE_CHECKING:
-    from core.models.user import User
-
-
 TokenType = Literal["access", "refresh"]
 
 
 class TokenBlacklist(IdIntPKMixin, Base):
-    jti: Mapped[UUID] = mapped_column(
+    jti: Mapped[str] = mapped_column(
         String(36),
         nullable=False,
         unique=True,
@@ -26,7 +22,7 @@ class TokenBlacklist(IdIntPKMixin, Base):
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
-    token_type: Mapped[TokenType] = mapped_column(
+    token_type: Mapped[str] = mapped_column(
         String(10),
         nullable=False,
     )
@@ -48,9 +44,9 @@ class TokenBlacklist(IdIntPKMixin, Base):
     revoked_at: Mapped[Optional[datetime]] = mapped_column(
         nullable=True,
     )
-    user: Mapped["User"] = relationship(
-        back_populates="revoked_tokens",
-    )
+    # user: Mapped["User"] = relationship(
+    #     back_populates="revoked_tokens",
+    # )
 
     __table_args__ = (
         Index(

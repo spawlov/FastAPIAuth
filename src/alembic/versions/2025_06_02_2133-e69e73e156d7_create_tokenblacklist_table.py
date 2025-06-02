@@ -1,8 +1,8 @@
 """Create TokenBlacklist table
 
-Revision ID: 45fcd6c0528c
+Revision ID: e69e73e156d7
 Revises: 817251d15875
-Create Date: 2025-06-02 20:12:53.615045
+Create Date: 2025-06-02 21:33:24.132780
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "45fcd6c0528c"
+revision: str = "e69e73e156d7"
 down_revision: Union[str, None] = "817251d15875"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

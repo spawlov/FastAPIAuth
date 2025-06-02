@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timezone
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError, VerifyMismatchError, InvalidHashError
@@ -8,9 +9,9 @@ from pydantic import SecretStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
+from starlette.requests import Request
 
-from core.models import User
-
+from core.models import User, TokenBlacklist
 
 logger = logging.getLogger(__name__)
 
@@ -75,3 +76,22 @@ async def get_user_by_id(
         )
     _validate_user_active(user)
     return user
+
+
+async def create_jwt_record(
+    session: AsyncSession,
+    jti: str,
+    user_id: int,
+    token_type: str,
+    request: Request | None = None,
+) -> None:
+    jwt_record = TokenBlacklist(
+        jti=jti,
+        user_id=user_id,
+        token_type=token_type,
+        ip_address=request.client.host if request else None,
+        user_agent=request.headers.get("user-agent") if request else None,
+        created_at=datetime.now(timezone.utc),
+    )
+    session.add(jwt_record)
+    await session.commit()
