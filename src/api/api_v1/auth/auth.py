@@ -23,6 +23,7 @@ from .utils import (
     get_access_token,
     get_refresh_token,
     create_jwt,
+    get_user_id,
 )
 
 
@@ -71,17 +72,7 @@ async def refresh_jwt(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     refresh_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> TokenInfo:
-    if (current_token_type := refresh_payload.get("type")) != "refresh":
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token type: {current_token_type!r}, expected 'refresh'",
-        )
-    user_id = refresh_payload.get("sub")
-    if not user_id:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
+    user_id = get_user_id(refresh_payload, expect_type="refresh")
     user = await get_user_by_id(session, user_id)
     jwt_payload = {
         "sub": str(user.id),
@@ -104,16 +95,6 @@ async def me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     access_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> AuthUser:
-    if (current_token_type := access_payload.get("type")) != "access":
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token type: {current_token_type!r}, expected 'access'",
-        )
-    user_id = access_payload.get("sub")
-    if not user_id:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
+    user_id = get_user_id(access_payload, expect_type="access")
     user = await get_user_by_id(session, user_id)
     return AuthUser.model_validate(user)

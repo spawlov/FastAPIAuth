@@ -94,3 +94,20 @@ def get_current_token_payload(
             detail="Invalid Token",
         )
     return payload
+
+
+def get_user_id(
+    token_payload: dict[str, Any],
+    expect_type: str,
+) -> int:
+    if (current_token_type := token_payload.get("type")) != expect_type:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token type: {current_token_type!r}, expected {expect_type!r}",
+        )
+    if not (user_id := token_payload.get("sub")):
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+    return int(user_id)
