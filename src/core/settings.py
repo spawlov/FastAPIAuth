@@ -14,7 +14,8 @@ class AuthJWT(BaseModel):
     algorithm: str = "RS256"
     private_key: str = Path(BASE_DIR / "certs/jwt-private.pem").read_text()
     public_key: str = Path(BASE_DIR / "certs/jwt-public.pem").read_text()
-    exp_minutes: int = 15
+    access_exp_minutes: int = 15
+    refresh_exp_minutes: int = 60 * 24 * 30
 
 
 class APIV1Settings(BaseModel):

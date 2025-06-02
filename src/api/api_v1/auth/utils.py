@@ -20,9 +20,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 def encode_jwt(
     payload: dict[str, Any],
+    expires_in: timedelta,
     private_key: str = settings.auth_jwt.private_key,
     algorithm: str = settings.auth_jwt.algorithm,
-    expires_in: timedelta = timedelta(minutes=settings.auth_jwt.exp_minutes),
 ) -> str:
     to_encode = payload.copy()
     to_encode.update(
@@ -49,6 +49,37 @@ def decode_jwt(
         algorithms=[algorithm],
     )
     return jwt_decoded
+
+
+def create_jwt(type_token: str, token_payload: dict[str, Any], expires: int) -> str:
+    jwt_payload = {
+        "type": type_token,
+    }
+    jwt_payload.update(token_payload)
+    expire_in = timedelta(minutes=expires)
+    return encode_jwt(
+        jwt_payload,
+        expires_in=expire_in,
+    )
+
+
+def get_access_token(jwt_payload: dict[str, Any]) -> str:
+    return create_jwt(
+        type_token="access",
+        token_payload=jwt_payload,
+        expires=settings.auth_jwt.access_exp_minutes,
+    )
+
+
+def get_refresh_token(jwt_payload: dict[str, Any]) -> str:
+    payload: dict[str, Any] = {
+        "sub": jwt_payload["sub"],
+    }
+    return create_jwt(
+        type_token="refresh",
+        token_payload=payload,
+        expires=settings.auth_jwt.refresh_exp_minutes,
+    )
 
 
 def get_current_token_payload(

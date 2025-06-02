@@ -66,10 +66,12 @@ async def get_user_by_id(
     user_id: int,
 ) -> User:
     stmt = select(User).where(User.id == user_id)
-    if user := await session.scalar(stmt):
-        return user
-    logger.error(f"User not found: {user_id}")
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="User not found",
-    )
+    user = await session.scalar(stmt)
+    if not user:
+        logger.error(f"User not found: {user_id}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    _validate_user_active(user)
+    return user
