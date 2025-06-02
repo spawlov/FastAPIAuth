@@ -7,7 +7,6 @@ from typing import (
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
 )
 from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
 from pydantic import SecretStr
@@ -18,14 +17,11 @@ from core.models.db_helper import db_helper
 from core.schemas.auth import TokenInfo, AuthUser
 from crud.auth import get_auth_user, get_user_by_id
 from .utils import (
-    encode_jwt,
     get_current_token_payload,
     get_access_token,
     get_refresh_token,
-    create_jwt,
     get_user_id,
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +80,7 @@ async def refresh_jwt(
     )
 
 
-@router.get(
+@router.post(
     "/me",
     status_code=status.HTTP_200_OK,
     response_model=AuthUser,
