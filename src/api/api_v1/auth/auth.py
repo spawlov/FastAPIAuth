@@ -90,7 +90,10 @@ async def logout(
         )
         message = "Logged out successfully"
 
-    return {"message": message}
+    return {
+        "message": "success",
+        "details": message,
+    }
 
 
 @router.post(
