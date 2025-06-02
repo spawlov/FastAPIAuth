@@ -9,9 +9,6 @@ from core.models import Base
 from core.models.mixins.id_int_pk import IdIntPKMixin
 
 
-TokenType = Literal["access", "refresh"]
-
-
 class TokenBlacklist(IdIntPKMixin, Base):
     jti: Mapped[str] = mapped_column(
         String(36),
