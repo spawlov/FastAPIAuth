@@ -35,7 +35,14 @@ APP__DB__URL=sqlite+aiosqlite:///./db.sqlite3
 alembic upgrade head
 ```
 
-Запустите файл `main.py`:
+Перейдите в папку `certs` создайте приватный и публичный ключи:
+
+```shell
+openssl genrsa -out jwt-private.pem 2048
+openssl rsa -in jwt-private.pem -outform PEM -pubout -out jwt-public.pem
+```
+
+Вернитесь в папку `src` и запустите файл `main.py`:
 
 ```shell
 python main.py
