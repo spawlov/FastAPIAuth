@@ -18,9 +18,6 @@ logger = logging.getLogger(__name__)
 # Добавляем кэш для хранения отозванных токенов (заменить на Redis в продакшене)
 REVOKED_TOKENS_CACHE = set()
 
-# Добавляем кэш для отслеживания неудачных попыток входа (по IP)
-FAILED_LOGIN_ATTEMPTS = {}
-
 security = HTTPBasic()
 ph = PasswordHasher()
 

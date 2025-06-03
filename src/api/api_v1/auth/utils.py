@@ -1,11 +1,12 @@
 import logging
 import uuid
 from datetime import timedelta, datetime, timezone
+from functools import wraps
 from typing import Any
 
 import jwt
 from fastapi import HTTPException, Depends, Request
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -14,6 +15,9 @@ from core.settings import settings
 from crud.auth import create_jwt_record, is_token_revoked
 
 logger = logging.getLogger(__name__)
+
+# Простой in-memory rate limiter (использовать Redis)
+RATE_LIMIT_DATA = {}
 
 oauth2_scheme = OAuth2PasswordBearer(
     settings.auth_jwt.token_url,
@@ -147,3 +151,34 @@ async def get_user_id(
             detail="Invalid token",
         )
     return int(user_id)
+
+
+def rate_limited(max_calls: int, time_frame: int):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(
+            request: Request,
+            session: AsyncSession,
+            form_data: OAuth2PasswordRequestForm,
+        ):
+            client_ip = request.client.host
+            now = datetime.now()
+            requests_data = RATE_LIMIT_DATA.get(client_ip, [])
+            requests_data = [
+                t for t in requests_data if now - t < timedelta(seconds=time_frame)
+            ]
+
+            if len(requests_data) >= max_calls:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail=f"Too many requests. Try again later.",
+                )
+
+            requests_data.append(now)
+            RATE_LIMIT_DATA[client_ip] = requests_data
+
+            return await func(request, session, form_data)
+
+        return wrapper
+
+    return decorator

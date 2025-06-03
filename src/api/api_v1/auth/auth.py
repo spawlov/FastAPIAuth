@@ -8,6 +8,7 @@ from fastapi import (
     APIRouter,
     Depends,
     Request,
+    HTTPException,
 )
 from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
 from pydantic import SecretStr
@@ -27,6 +28,7 @@ from .utils import (
     get_access_token,
     get_refresh_token,
     get_user_id,
+    rate_limited,
 )
 
 logger = logging.getLogger(__name__)
@@ -42,27 +44,34 @@ router = APIRouter(dependencies=[Depends(http_bearer)])
     response_model=TokenInfo,
     response_model_exclude_none=True,
 )
+@rate_limited(max_calls=5, time_frame=60)
 async def login(
     request: Request,
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> TokenInfo:
-    user = await get_auth_user(
-        session,
-        form_data.username,
-        SecretStr(form_data.password),
-    )
-    jwt_payload = {
-        "sub": str(user.id),
-        "username": user.nickname,
-    }
-    access_token = await get_access_token(session, jwt_payload, request)
-    refresh_token = await get_refresh_token(session, jwt_payload, request)
+    client_ip = request.client.host
+    try:
+        user = await get_auth_user(
+            session,
+            form_data.username,
+            SecretStr(form_data.password),
+        )
 
-    return TokenInfo(
-        access_token=access_token,
-        refresh_token=refresh_token,
-    )
+        jwt_payload = {
+            "sub": str(user.id),
+            "username": user.nickname,
+        }
+        access_token = await get_access_token(session, jwt_payload, request)
+        refresh_token = await get_refresh_token(session, jwt_payload, request)
+
+        return TokenInfo(
+            access_token=access_token,
+            refresh_token=refresh_token,
+        )
+    except HTTPException as exception:
+        logger.warning(f"Login failed for {form_data.username} from {client_ip}")
+        raise exception
 
 
 @router.post(
