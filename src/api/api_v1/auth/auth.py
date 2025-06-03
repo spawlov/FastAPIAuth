@@ -9,11 +9,11 @@ from fastapi import (
     Depends,
     Request,
     HTTPException,
+    status,
 )
 from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
 from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
 from core.models import User
 from core.models.db_helper import db_helper
