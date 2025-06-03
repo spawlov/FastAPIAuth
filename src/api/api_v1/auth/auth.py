@@ -15,13 +15,16 @@ from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from core.models import User
 from core.models.db_helper import db_helper
 from core.schemas.auth import TokenInfo, AuthUser
+from core.schemas.users import UserRead
 from crud.auth import (
     get_auth_user,
     get_user_by_id,
     revoke_token,
     revoke_all_user_tokens,
+    get_all_users,
 )
 from .utils import (
     get_current_token_payload,
@@ -69,9 +72,15 @@ async def login(
             access_token=access_token,
             refresh_token=refresh_token,
         )
-    except HTTPException as exception:
-        logger.warning(f"Login failed for {form_data.username} from {client_ip}")
-        raise exception
+    except HTTPException as exc:
+        logger.warning(f"Failed login attempt from {client_ip}: {exc.detail}")
+        raise
+    except Exception as exc:
+        logger.error(f"Unexpected error during login: {exc}")
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )
 
 
 @router.post(
@@ -128,7 +137,7 @@ async def refresh_jwt(
     )
 
 
-@router.post(
+@router.get(
     "/me",
     status_code=status.HTTP_200_OK,
     response_model=AuthUser,
@@ -142,3 +151,22 @@ async def me(
     user_id = await get_user_id(session, access_payload, expect_token_type="access")
     user = await get_user_by_id(session, user_id)
     return AuthUser.model_validate(user)
+
+
+@router.get(
+    "/all_users",
+    response_model=list[UserRead],
+    status_code=status.HTTP_200_OK,
+)
+async def all_users(
+    session: Annotated[AsyncSession, Depends(db_helper.get_session)],
+    access_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
+) -> list[User]:
+    user_id = await get_user_id(session, access_payload, expect_token_type="access")
+    user = await get_user_by_id(session, user_id)
+    if not user.is_superuser:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: superuser only",
+        )
+    return await get_all_users(session)

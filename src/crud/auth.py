@@ -81,6 +81,14 @@ async def get_user_by_id(
     return user
 
 
+async def get_all_users(
+    session: AsyncSession,
+) -> list[User]:
+    stmt = select(User).order_by(User.id)
+    users = await session.scalars(stmt)
+    return list(users)
+
+
 async def create_jwt_record(
     session: AsyncSession,
     jti: str,

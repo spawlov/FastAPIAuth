@@ -11,18 +11,18 @@ from crud import users as crud_users
 router = APIRouter()
 
 
-@router.get(
-    "/",
-    response_model=list[UserRead],
-    status_code=200,
-)
-async def get_all_users(
-    session: Annotated[
-        AsyncSession,
-        Depends(db_helper.get_session),
-    ],
-) -> list[User]:
-    return await crud_users.get_all_users(session)
+# @router.get(
+#     "/",
+#     response_model=list[UserRead],
+#     status_code=200,
+# )
+# async def get_all_users(
+#     session: Annotated[
+#         AsyncSession,
+#         Depends(db_helper.get_session),
+#     ],
+# ) -> list[User]:
+#     return await crud_users.get_all_users(session)
 
 
 @router.post("/register", response_model=UserRead, status_code=201)

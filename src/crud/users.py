@@ -1,6 +1,5 @@
 from argon2 import PasswordHasher
 from fastapi import HTTPException
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -39,11 +38,3 @@ async def create_user(
             detail=f"Could not create user",
         )
     return user
-
-
-async def get_all_users(
-    session: AsyncSession,
-) -> list[User]:
-    stmt = select(User).order_by(User.id)
-    users = await session.scalars(stmt)
-    return list(users)
