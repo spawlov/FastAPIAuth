@@ -8,7 +8,6 @@ from fastapi import FastAPI
 from api import router as api_router
 from core.settings import settings
 
-
 logger = logging.getLogger(__name__)
 
 

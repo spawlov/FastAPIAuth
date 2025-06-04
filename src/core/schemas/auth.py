@@ -1,10 +1,16 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, SecretStr
 
+TokenType = Literal[
+    "access",
+    "refresh",
+]
+
 
 class AuthUser(BaseModel):
-    id: int
+    id: int  # noqa: A003, VNE003
     nickname: str
     password: str
     first_name: str | None

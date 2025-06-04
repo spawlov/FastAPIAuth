@@ -21,5 +21,5 @@ class Base(DeclarativeBase):
     )
 
     @declared_attr.directive
-    def __tablename__(cls):
+    def __tablename__(cls) -> str:  # noqa
         return f"{cls.__name__.lower()}s"

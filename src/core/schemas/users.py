@@ -1,8 +1,8 @@
-from pydantic import BaseModel, EmailStr, SecretStr, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserRead(BaseModel):
-    id: int
+    id: int  # noqa: A003, VNE003
     nickname: str
     email: EmailStr
 

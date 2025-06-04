@@ -1,5 +1,6 @@
-from core.settings import settings
 from fastapi import APIRouter
+
+from core.settings import settings
 
 from .auth.auth import router as auth_router
 from .users.users import router as users_router

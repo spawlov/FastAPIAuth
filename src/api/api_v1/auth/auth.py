@@ -1,34 +1,32 @@
 import logging
-from typing import (
-    Annotated,
-    Any,
-)
+from typing import Annotated, Any
 
 from fastapi import (
     APIRouter,
     Depends,
-    Request,
     HTTPException,
+    Request,
     status,
 )
-from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer
+from fastapi.security import HTTPBearer, OAuth2PasswordRequestForm
 from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import User
 from core.models.db_helper import db_helper
-from core.schemas.auth import TokenInfo, AuthUser
+from core.schemas.auth import AuthUser, TokenInfo
 from core.schemas.users import UserRead
 from crud.auth import (
+    get_all_users,
     get_auth_user,
     get_user_by_id,
-    revoke_token,
     revoke_all_user_tokens,
-    get_all_users,
+    revoke_token,
 )
+
 from .utils import (
-    get_current_token_payload,
     get_access_token,
+    get_current_token_payload,
     get_refresh_token,
     get_user_id,
     rate_limited,
@@ -92,7 +90,7 @@ async def logout(
     access_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
     logout_all: bool = False,
 ) -> dict[str, str]:
-    user_id = await get_user_id(session, access_payload, expect_token_type="access")
+    user_id = await get_user_id(session, access_payload, "access")
     if logout_all:
         await revoke_all_user_tokens(
             session=session,
@@ -125,7 +123,7 @@ async def refresh_jwt(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     refresh_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> TokenInfo:
-    user_id = await get_user_id(session, refresh_payload, expect_token_type="refresh")
+    user_id = await get_user_id(session, refresh_payload, "refresh")
     user = await get_user_by_id(session, user_id)
     jwt_payload = {
         "sub": str(user.id),
@@ -148,7 +146,7 @@ async def me(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     access_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> AuthUser:
-    user_id = await get_user_id(session, access_payload, expect_token_type="access")
+    user_id = await get_user_id(session, access_payload, "access")
     user = await get_user_by_id(session, user_id)
     return AuthUser.model_validate(user)
 
@@ -162,7 +160,7 @@ async def all_users(
     session: Annotated[AsyncSession, Depends(db_helper.get_session)],
     access_payload: Annotated[dict[str, Any], Depends(get_current_token_payload)],
 ) -> list[User]:
-    user_id = await get_user_id(session, access_payload, expect_token_type="access")
+    user_id = await get_user_id(session, access_payload, "access")
     user = await get_user_by_id(session, user_id)
     if not user.is_superuser:
         raise HTTPException(

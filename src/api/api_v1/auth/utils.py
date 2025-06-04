@@ -1,16 +1,17 @@
 import logging
 import uuid
-from datetime import timedelta, datetime, timezone
+from datetime import datetime, timedelta, timezone
 from functools import wraps
-from typing import Any
+from typing import Annotated, Any
 
 import jwt
-from fastapi import HTTPException, Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from core.schemas.auth import TokenType
 from core.settings import settings
 from crud.auth import create_jwt_record, is_token_revoked
 
@@ -60,13 +61,13 @@ def decode_jwt(
 
 async def create_jwt(
     session: AsyncSession,
-    type_token: str,
+    token_type: TokenType,
     token_payload: dict[str, Any],
     expires: int,
     request: Request | None = None,
 ) -> str:
     jwt_payload = {
-        "type": type_token,
+        "type": token_type,
     }
     jwt_payload.update(token_payload)
     expire_in = timedelta(minutes=expires)
@@ -75,7 +76,7 @@ async def create_jwt(
         session=session,
         jti=jti,
         user_id=token_payload["sub"],
-        token_type=type_token,
+        token_type=token_type,
         request=request,
     )
     return encode_jwt(
@@ -90,9 +91,9 @@ async def get_access_token(
     jwt_payload: dict[str, Any],
     request: Request | None = None,
 ) -> str:
-    return await create_jwt(
+    return await create_jwt(  # noqa
         session=session,
-        type_token="access",
+        token_type="access",
         token_payload=jwt_payload,
         expires=settings.auth_jwt.access_exp_minutes,
         request=request,
@@ -107,9 +108,9 @@ async def get_refresh_token(
     payload: dict[str, Any] = {
         "sub": jwt_payload["sub"],
     }
-    return await create_jwt(
+    return await create_jwt(  # noqa
         session=session,
-        type_token="refresh",
+        token_type="refresh",
         token_payload=payload,
         expires=settings.auth_jwt.refresh_exp_minutes,
         request=request,
@@ -117,7 +118,7 @@ async def get_refresh_token(
 
 
 def get_current_token_payload(
-    token: str = Depends(oauth2_scheme),
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> dict[str, Any]:
     try:
         payload = decode_jwt(token)
@@ -133,7 +134,7 @@ def get_current_token_payload(
 async def get_user_id(
     session: AsyncSession,
     token_payload: dict[str, Any],
-    expect_token_type: str,
+    expect_token_type: TokenType,
 ) -> int:
     if await is_token_revoked(session, token_payload.get("jti")):
         raise HTTPException(
@@ -164,14 +165,12 @@ def rate_limited(max_calls: int, time_frame: int):
             client_ip = request.client.host
             now = datetime.now()
             requests_data = RATE_LIMIT_DATA.get(client_ip, [])
-            requests_data = [
-                t for t in requests_data if now - t < timedelta(seconds=time_frame)
-            ]
+            requests_data = [t for t in requests_data if now - t < timedelta(seconds=time_frame)]
 
             if len(requests_data) >= max_calls:
                 raise HTTPException(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail=f"Too many requests. Try again later.",
+                    detail="Too many requests. Try again later.",
                 )
 
             requests_data.append(now)

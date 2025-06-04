@@ -1,12 +1,12 @@
 from datetime import datetime, timezone
-from typing import Literal, Optional, TYPE_CHECKING
-from uuid import UUID
+from typing import Optional
 
-from sqlalchemy import String, ForeignKey, Index
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, Index, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from core.models import Base
 from core.models.mixins.id_int_pk import IdIntPKMixin
+from core.schemas.auth import TokenType
 
 
 class TokenBlacklist(IdIntPKMixin, Base):
@@ -19,7 +19,7 @@ class TokenBlacklist(IdIntPKMixin, Base):
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
-    token_type: Mapped[str] = mapped_column(
+    token_type: Mapped[TokenType] = mapped_column(
         String(10),
         nullable=False,
     )
