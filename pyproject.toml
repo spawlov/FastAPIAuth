@@ -14,9 +14,13 @@ pydantic-settings = "^2.9.1"
 alembic = "^1.16.1"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.41"}
 aiosqlite = "^0.21.0"
-argon2-cffi = "^23.1.0"
+argon2-cffi = "^25.1.0"
 pyjwt = {extras = ["crypto"], version = "^2.10.1"}
 python-multipart = "^0.0.20"
+httpx = "^0.28.1"
+pytest = {extras = ["asyncio"], version = "^8.4.0"}
+pytest-asyncio = "^1.0.0"
+pytest-cov = "^6.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -25,6 +29,9 @@ black = "^25.1.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [tool.black]
 line-length = 120
