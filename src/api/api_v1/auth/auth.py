@@ -1,13 +1,7 @@
 import logging
 from typing import Annotated, Any
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Request,
-    status,
-)
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, OAuth2PasswordRequestForm
 from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,21 +10,9 @@ from core.models import User
 from core.models.db_helper import db_helper
 from core.schemas.auth import AuthUser, TokenInfo
 from core.schemas.users import UserRead
-from crud.auth import (
-    get_all_users,
-    get_auth_user,
-    get_user_by_id,
-    revoke_all_user_tokens,
-    revoke_token,
-)
+from crud.auth import get_all_users, get_auth_user, get_user_by_id, revoke_all_user_tokens, revoke_token
 
-from .utils import (
-    get_access_token,
-    get_current_token_payload,
-    get_refresh_token,
-    get_user_id,
-    rate_limited,
-)
+from .utils import get_access_token, get_current_token_payload, get_refresh_token, get_user_id, rate_limited
 
 logger = logging.getLogger(__name__)
 
