@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta, timezone
+from typing import Any
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -26,3 +29,29 @@ def access_token() -> str:
 @pytest.fixture
 def refresh_token() -> str:
     return REFRESH_TOKEN
+
+
+@pytest.fixture
+def valid_access_token_payload() -> dict[str, Any]:
+    jwt_payload = {
+        "type": "access",
+        "sub": "1",
+        "username": "test",
+        "iat": datetime.now(timezone.utc),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=5),
+        "jti": "123-456-7890",
+    }
+    return jwt_payload
+
+
+@pytest.fixture
+def valid_refresh_token_payload() -> dict[str, Any]:
+    jwt_payload = {
+        "type": "refresh",
+        "sub": "1",
+        "username": "test",
+        "iat": datetime.now(timezone.utc),
+        "exp": datetime.now(timezone.utc) + timedelta(days=30),
+        "jti": "123-456-7890",
+    }
+    return jwt_payload

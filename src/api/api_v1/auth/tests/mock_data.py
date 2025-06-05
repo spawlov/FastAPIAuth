@@ -12,7 +12,7 @@ USER: dict[str, Any] = {
 }
 
 SUPERUSER: dict[str, Any] = {
-    id: 1,
+    "id": 2,
     "nickname": "super_user",
     "password": "super_password",
     "first_name": "Super",
