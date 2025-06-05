@@ -69,5 +69,5 @@ exclude = [
 ]
 per-file-ignores = [
     "__init__.py: F401",  # Разрешает неиспользуемые импорты в __init__.py
-    "/*/tests/*.py: S101",
+    "/*/tests/*.py: S101", # Использование assert в тестах
 ]
