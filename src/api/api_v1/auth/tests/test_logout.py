@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -36,7 +37,7 @@ class TestLogout:
     async def test_successful_logout_all(
         self,
         async_client: AsyncClient,
-        valid_access_token_payload,
+        valid_access_token_payload: dict[str, Any],
     ) -> None:
         with patch(
             "api.api_v1.auth.auth.get_user_id",
