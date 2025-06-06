@@ -1,8 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from fastapi import status
 from httpx import AsyncClient
-from starlette import status
 
 
 class TestLogout:
