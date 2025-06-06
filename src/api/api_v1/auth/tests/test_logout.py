@@ -1,5 +1,4 @@
-from typing import Any
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -26,9 +25,8 @@ class TestLogout:
         ):
             result = await async_client.post(
                 url="/api/v1/auth/logout",
-                headers={
-                    "Authorization": "Bearer access_token",
-                },
+                headers={"Authorization": "Bearer access_token"},
+                params={"logout_all": "false"},
             )
             assert result.status_code == status.HTTP_200_OK
             assert result.json()["message"] == "success"
@@ -51,10 +49,9 @@ class TestLogout:
             MagicMock(return_value=valid_access_token_payload),
         ):
             result = await async_client.post(
-                url="/api/v1/auth/logout?logout_all=true",
-                headers={
-                    "Authorization": "Bearer access_token",
-                },
+                url="/api/v1/auth/logout",
+                headers={"Authorization": "Bearer access_token"},
+                params={"logout_all": "true"},
             )
             assert result.status_code == status.HTTP_200_OK
             assert result.json()["message"] == "success"
