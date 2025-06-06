@@ -33,7 +33,7 @@ class TestRefresh:
         ):
 
             result = await async_client.post(
-                "/api/v1/auth/refresh",
+                url="/api/v1/auth/refresh",
                 headers={"Authorization": "Bearer refresh_token"},
             )
             assert result.status_code == status.HTTP_200_OK
