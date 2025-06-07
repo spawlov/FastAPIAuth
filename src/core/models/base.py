@@ -1,6 +1,8 @@
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 
+from utils import camel_case_to_snake_case
+
 
 def get_naming_convention() -> dict[str, str]:
     conventions = {
@@ -22,4 +24,4 @@ class Base(DeclarativeBase):
 
     @declared_attr.directive
     def __tablename__(cls) -> str:  # noqa: N805
-        return f"{cls.__name__.lower()}s"
+        return f"{camel_case_to_snake_case(cls.__name__)}s"
