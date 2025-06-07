@@ -136,6 +136,11 @@ async def get_user_id(
     token_payload: dict[str, Any],
     expect_token_type: TokenType,
 ) -> int:
+    if not token_payload or not isinstance(token_payload, dict):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No token_payload provided or wrong token_payload type",
+        )
     if await is_token_revoked(session, token_payload.get("jti")):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
