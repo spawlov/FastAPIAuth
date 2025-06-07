@@ -4,9 +4,10 @@ from typing import Any
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from api.api_v1.auth.tests.mock_data import ACCESS_TOKEN, REFRESH_TOKEN, USER
 from core.models import User
 from main import main_app
+
+from .mock_data import ACCESS_TOKEN, REFRESH_TOKEN, USER
 
 
 @pytest.fixture

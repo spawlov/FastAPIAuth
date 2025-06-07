@@ -31,6 +31,9 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src/tests"]
+norecursedirs = ["build", "dist", ".git", "__pycache__"]
 asyncio_mode = "auto"
 
 [tool.black]
