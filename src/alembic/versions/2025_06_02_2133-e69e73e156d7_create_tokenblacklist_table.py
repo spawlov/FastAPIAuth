@@ -22,7 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
-        "tokenblacklists",
+        "token_blacklists",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("jti", sa.String(length=36), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
@@ -35,22 +35,22 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.id"],
-            name=op.f("fk_tokenblacklists_user_id_users"),
+            name=op.f("fk_token_blacklists_user_id_users"),
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_tokenblacklists")),
-        sa.UniqueConstraint("jti", name=op.f("uq_tokenblacklists_jti")),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_token_blacklists")),
+        sa.UniqueConstraint("jti", name=op.f("uq_token_blacklists_jti")),
     )
     op.create_index(
         "ix_token_blacklist_created_at",
-        "tokenblacklists",
+        "token_blacklists",
         ["created_at"],
         unique=False,
     )
-    op.create_index("ix_token_blacklist_jti", "tokenblacklists", ["jti"], unique=True)
+    op.create_index("ix_token_blacklist_jti", "token_blacklists", ["jti"], unique=True)
     op.create_index(
         "ix_token_blacklist_user_id",
-        "tokenblacklists",
+        "token_blacklists",
         ["user_id"],
         unique=False,
     )
@@ -58,7 +58,7 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_index("ix_token_blacklist_user_id", table_name="tokenblacklists")
-    op.drop_index("ix_token_blacklist_jti", table_name="tokenblacklists")
-    op.drop_index("ix_token_blacklist_created_at", table_name="tokenblacklists")
-    op.drop_table("tokenblacklists")
+    op.drop_index("ix_token_blacklist_user_id", table_name="token_blacklists")
+    op.drop_index("ix_token_blacklist_jti", table_name="token_blacklists")
+    op.drop_index("ix_token_blacklist_created_at", table_name="token_blacklists")
+    op.drop_table("token_blacklists")
