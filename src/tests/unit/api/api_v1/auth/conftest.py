@@ -44,3 +44,12 @@ def valid_access_token_payload() -> dict[str, Any]:
         "username": "test",
     }
     return jwt_payload
+
+
+@pytest.fixture
+def valid_refresh_token_payload() -> dict[str, Any]:
+    jwt_payload = {
+        "type": "refresh",
+        "sub": "1",
+    }
+    return jwt_payload
