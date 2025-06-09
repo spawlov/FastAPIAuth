@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 from fastapi import HTTPException, status
+from pytest_mock import MockerFixture
 
 from api.api_v1.auth.utils import get_current_token_payload
 
@@ -9,7 +10,7 @@ from api.api_v1.auth.utils import get_current_token_payload
 class TestGetCurrentTokenPayload:
     def test_get_current_token_payload_valid(
         self,
-        mocker,
+        mocker: MockerFixture,
         valid_access_token_payload: dict[str, Any],
     ) -> None:
         mocker.patch("api.api_v1.auth.utils.decode_jwt", return_value=valid_access_token_payload)

@@ -3,13 +3,14 @@ from typing import Any
 import pytest
 from fastapi import status
 from httpx import AsyncClient
+from pytest_mock import MockerFixture
 
 
 class TestLogout:
     @pytest.mark.asyncio
     async def test_successful_logout(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
         valid_access_token_payload,
         access_token: str,
@@ -30,7 +31,7 @@ class TestLogout:
     @pytest.mark.asyncio
     async def test_successful_logout_all(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
         valid_access_token_payload: dict[str, Any],
     ) -> None:

@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 from fastapi import status
 from httpx import AsyncClient
+from pytest_mock import MockerFixture
 
 from core.models import User
 
@@ -11,7 +12,7 @@ class TestMe:
     @pytest.mark.asyncio
     async def test_me_success(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
         valid_access_token_payload: dict[str, Any],
         mock_user: User,
@@ -36,7 +37,7 @@ class TestMe:
     @pytest.mark.asyncio
     async def test_me_failure_with_refresh_token(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
         valid_refresh_token_payload: dict[str, Any],
     ) -> None:

@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 from fastapi import HTTPException
+from pytest_mock import MockerFixture
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -12,7 +13,7 @@ class TestGetUserId:
     @pytest.mark.asyncio
     async def test_get_user_id(
         self,
-        mocker,
+        mocker: MockerFixture,
         session: AsyncSession,
         valid_access_token_payload: dict[str, Any],
     ) -> None:
@@ -24,7 +25,7 @@ class TestGetUserId:
     @pytest.mark.asyncio
     async def test_get_user_with_revoked_token(
         self,
-        mocker,
+        mocker: MockerFixture,
         session: AsyncSession,
         valid_access_token_payload: dict[str, Any],
     ) -> None:
@@ -38,7 +39,7 @@ class TestGetUserId:
     @pytest.mark.asyncio
     async def test_get_user_with_wrong_token_type(
         self,
-        mocker,
+        mocker: MockerFixture,
         session: AsyncSession,
         valid_refresh_token_payload: dict[str, Any],
     ) -> None:
@@ -53,7 +54,7 @@ class TestGetUserId:
     @pytest.mark.parametrize("payload", [None, "WrongType"])
     async def test_get_user_with_invalid_token_type(
         self,
-        mocker,
+        mocker: MockerFixture,
         session: AsyncSession,
         payload: str | None,
     ) -> None:
@@ -67,7 +68,7 @@ class TestGetUserId:
     @pytest.mark.asyncio
     async def test_get_user_without_sub(
         self,
-        mocker,
+        mocker: MockerFixture,
         session: AsyncSession,
         valid_access_token_payload: dict[str, Any],
     ) -> None:

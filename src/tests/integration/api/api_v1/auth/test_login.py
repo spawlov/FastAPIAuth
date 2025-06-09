@@ -1,6 +1,7 @@
 import pytest
 from fastapi import HTTPException, status
 from httpx import AsyncClient
+from pytest_mock import MockerFixture
 
 from api.api_v1.auth.utils import RATE_LIMIT_DATA
 from core.models import User
@@ -11,7 +12,7 @@ class TestLogin:
     @pytest.mark.asyncio
     async def test_login_success(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
         mock_user: User,
         access_token: str,
@@ -40,7 +41,7 @@ class TestLogin:
     @pytest.mark.asyncio
     async def test_login_with_invalid_credentials(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
     ):
         RATE_LIMIT_DATA.clear()
@@ -66,7 +67,7 @@ class TestLogin:
     @pytest.mark.asyncio
     async def test_login_with_rate_limited(
         self,
-        mocker,
+        mocker: MockerFixture,
         async_client: AsyncClient,
         mock_user: User,
         access_token: str,
