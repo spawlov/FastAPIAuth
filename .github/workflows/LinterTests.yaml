@@ -35,7 +35,7 @@ jobs:
           poetry install --no-interaction --no-root
           poetry add --dev flake8 flake8-bugbear flake8-print flake8-builtins flake8-cognitive-complexity flake8-commas flake8-variables-names pep8-naming
           poetry add --dev black
-          poetry add --dev pytest
+#          poetry add --dev pytest
 #          poetry add --dev isort
 #
 #
@@ -50,6 +50,12 @@ jobs:
       - name: Run black
         run: |
           poetry run black --line-length=120 --check .
+
+      - name: Generate test certificates
+        run: |
+          mkdir -p src/certs
+          openssl genrsa -out src/certs/jwt-private.pem 2048
+          openssl rsa -in src/certs/jwt-private.pem -pubout -out src/certs/jwt-public.pem
 
       - name: Run tests
         run: |
