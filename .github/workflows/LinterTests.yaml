@@ -57,4 +57,4 @@ jobs:
           openssl genrsa -out src/certs/jwt-private.pem 2048
           openssl rsa -in src/certs/jwt-private.pem -pubout -out src/certs/jwt-public.pem
           echo "APP__DB__URL=sqlite+aiosqlite:///./test.db" > .env.test
-          poetry run pytest -v
+          poetry run pytest -q
