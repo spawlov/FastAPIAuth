@@ -52,4 +52,5 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run pytest -v src/tests
+          cd src
+          poetry run pytest -v
