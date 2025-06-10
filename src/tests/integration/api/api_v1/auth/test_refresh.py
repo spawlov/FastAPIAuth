@@ -43,6 +43,7 @@ class TestRefresh:
         valid_access_token_payload: dict[str, Any],
     ) -> None:
         mocker.patch("api.api_v1.auth.utils.decode_jwt", return_value=valid_access_token_payload)
+        mocker.patch("api.api_v1.auth.utils.is_token_revoked", return_value=False)
 
         result = await async_client.post(
             "/api/v1/auth/refresh",
