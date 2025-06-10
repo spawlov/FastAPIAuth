@@ -49,14 +49,12 @@ jobs:
 
       - name: Run black
         run: |
-          poetry run black --line-length=120 --check .
+          poetry run black --line-length=120 --check . 
 
-      - name: Generate test certificates
+      - name: Run tests
         run: |
           mkdir -p src/certs
           openssl genrsa -out src/certs/jwt-private.pem 2048
           openssl rsa -in src/certs/jwt-private.pem -pubout -out src/certs/jwt-public.pem
-
-      - name: Run tests
-        run: |
+          echo "APP__DB__URL=sqlite+aiosqlite:///./test.db" > .env.test
           poetry run pytest -v
