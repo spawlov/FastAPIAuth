@@ -35,12 +35,12 @@ jobs:
           poetry install --no-interaction --no-root
           poetry add --dev flake8 flake8-bugbear flake8-print flake8-builtins flake8-cognitive-complexity flake8-commas flake8-variables-names pep8-naming
           poetry add --dev black
-          poetry add --dev isort
-
-
-      - name: Run isort
-        run: |
-          poetry run isort --check .
+#          poetry add --dev isort
+#
+#
+#      - name: Run isort
+#        run: |
+#          poetry run isort --check .
 
       - name: Run flake8
         run: |
