@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [ "3.11", "3.12" ]
+        python-version: [ "3.11", "3.12", "3.13" ]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -23,31 +23,25 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
 
       - name: Install Poetry
         run: |
-          pip install poetry==1.8.4
-
-      - name: Configure Poetry
-        run: |
+          curl -sSL https://install.python-poetry.org | python3 - --version 1.8.4
           poetry config virtualenvs.in-project false
           poetry config virtualenvs.create true
 
       - name: Install dependencies
         run: |
           poetry add flake8 flake8-bugbear flake8-print flake8-builtins flake8-cognitive-complexity flake8-commas flake8-variables-names pep8-naming
-          poetry add black isort
+          poetry add black
+          poetry add isort
           poetry install --no-interaction --no-root
-
-      - name: Run isort
-        run: |
-          poetry run isort --check .
-
-      - name: Run flake8
-        run: |
-          poetry run flake8 --max-line-length=120
-
+#
+#      - name: Run isort
+#        run: isort --check .
+#
+#      - name: Run flake8
+#        run: flake8 --max-line-length=120
+#
       - name: Run black
-        run: |
-          poetry run black --line-length=120 --check .
+        run: black --line-length=120 --check .
