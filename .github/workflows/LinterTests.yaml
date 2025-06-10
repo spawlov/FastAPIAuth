@@ -53,4 +53,4 @@ jobs:
 
       - name: Run tests
         run: |
-          poetry run pytest -v --rootdir=src src/tests 
+          poetry run pytest -v
