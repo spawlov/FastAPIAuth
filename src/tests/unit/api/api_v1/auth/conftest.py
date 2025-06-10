@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 
 @pytest.fixture
-async def session():
+async def session() -> AsyncSession:
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with async_session() as session:
@@ -15,7 +15,7 @@ async def session():
 
 
 @pytest.fixture
-def rsa_keys():
+def rsa_keys() -> dict[str, str]:
     private_key = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048,
