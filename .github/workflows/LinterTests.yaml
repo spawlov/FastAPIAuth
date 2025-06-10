@@ -30,12 +30,16 @@ jobs:
           curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python3 -
           poetry config virtualenvs.in-project false
           poetry install --no-interaction
+          pip install mdformat
+          poetry add flake8 flake8-bugbear flake8-print flake8-builtins flake8-cognitive-complexity flake8-commas flake8-variables-names pep8-naming        
+          poetry add black
+          poetry add isort
 
-#      - name: Run isort
-#        run: isort --check .
-#
-#      - name: Run flake8
-#        run: flake8 --max-line-length=120
+      - name: Run isort
+        run: isort --check .
+
+      - name: Run flake8
+        run: flake8 --max-line-length=120
 
       - name: Run black
         run: black --line-length=120 --check .
