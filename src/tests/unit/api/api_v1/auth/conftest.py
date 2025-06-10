@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, AsyncGenerator
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 
 @pytest.fixture
-async def session() -> AsyncSession:
+async def session() -> AsyncGenerator[AsyncSession, None]:
     engine = create_async_engine("sqlite+aiosqlite:///:memory:")
     async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with async_session() as session:
