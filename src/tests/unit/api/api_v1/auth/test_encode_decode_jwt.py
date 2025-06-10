@@ -6,7 +6,7 @@ import pytest
 from jwt import InvalidKeyError, InvalidTokenError
 
 from api.api_v1.auth.utils import decode_jwt, encode_jwt
-from tests.unit.api.api_v1.auth.conftest import rsa_keys
+from tests.unit.api.api_v1.auth.conftest import rsa_keys  # noqa: F401
 
 
 class TestEncodeDecodeJWT:
