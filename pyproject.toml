@@ -38,6 +38,9 @@ testpaths = ["src/tests"]
 norecursedirs = ["build", "dist", ".git", "__pycache__"]
 asyncio_mode = "auto"
 
+[tool.mypy]
+strict = true
+
 [tool.black]
 line-length = 120
 
