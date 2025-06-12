@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, AsyncGenerator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -11,7 +11,7 @@ from .mock_data import ACCESS_TOKEN, REFRESH_TOKEN, USER
 
 
 @pytest.fixture
-async def async_client() -> AsyncClient:
+async def async_client() -> AsyncGenerator[AsyncClient, None]:
     transport = ASGITransport(app=main_app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client

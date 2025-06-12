@@ -12,7 +12,7 @@ class TestLogout:
         self,
         mocker: MockerFixture,
         async_client: AsyncClient,
-        valid_access_token_payload,
+        valid_access_token_payload: dict[str, Any],
         access_token: str,
     ) -> None:
         mocker.patch("api.api_v1.auth.auth.get_user_id", return_value=1)
