@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install --no-interaction --no-root
-          poetry add --dev flake8 flake8-bugbear flake8-print flake8-builtins flake8-cognitive-complexity flake8-commas flake8-variables-names pep8-naming
+          poetry add --dev flake8 flake8-bandit flake8-bugbear flake8-print flake8-builtins flake8-annotations-complexity flake8-cognitive-complexity flake8-pyproject flake8-commas flake8-variables-names pep8-naming
           poetry add --dev black
           poetry add --dev isort
 
