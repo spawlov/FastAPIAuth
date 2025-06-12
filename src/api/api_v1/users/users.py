@@ -17,5 +17,6 @@ async def register_user(
         Depends(db_helper.get_session),
     ],
     user: UserCreate,
-):
-    return await crud_users.create_user(session, user)
+) -> UserRead:
+    result = await crud_users.create_user(session, user)
+    return UserRead.model_validate(result)

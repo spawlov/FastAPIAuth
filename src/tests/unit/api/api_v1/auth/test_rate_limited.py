@@ -17,7 +17,7 @@ class TestRateLimited:
             request: Request,
             session: AsyncSession | None,
             form_data: OAuth2PasswordRequestForm,
-        ):
+        ) -> dict[str, str]:
             return {"message": "OK"}
 
         request = Request(
