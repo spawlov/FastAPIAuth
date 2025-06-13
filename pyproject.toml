@@ -7,7 +7,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.115.12"
 uvicorn = {extras = ["standart"], version = "^0.34.2"}
 pydantic = {extras = ["email"], version = "^2.11.5"}
 pydantic-settings = "^2.9.1"
@@ -20,8 +19,9 @@ python-multipart = "^0.0.20"
 httpx = "^0.28.1"
 pytest = {extras = ["asyncio"], version = "^8.4.0"}
 pytest-asyncio = "^1.0.0"
-pytest-cov = "^6.1.1"
+pytest-cov = "^6.2.1"
 pytest-mock = "^3.14.1"
+fastapi = {extras = ["standard"], version = "^0.115.12"}
 
 
 [tool.poetry.group.dev.dependencies]
