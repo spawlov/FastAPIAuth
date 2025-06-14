@@ -18,7 +18,7 @@ from crud.auth import create_jwt_record, is_token_revoked
 logger = logging.getLogger(__name__)
 
 # Простой in-memory rate limiter (использовать Redis)
-RATE_LIMIT_DATA = {}
+RATE_LIMIT_DATA: dict[str, list[datetime]] = {}
 
 oauth2_scheme = OAuth2PasswordBearer(
     settings.auth_jwt.token_url,
@@ -50,7 +50,7 @@ def decode_jwt(
     token: str | bytes,
     public_key: str = settings.auth_jwt.public_key,
     algorithm: str = settings.auth_jwt.algorithm,
-) -> dict[str, Any]:
+) -> Any:
     jwt_decoded = jwt.decode(
         jwt=token,
         key=public_key,
@@ -119,7 +119,7 @@ async def get_refresh_token(
 
 def get_current_token_payload(
     token: Annotated[str, Depends(oauth2_scheme)],
-) -> dict[str, Any]:
+) -> Any:
     try:
         payload = decode_jwt(token)
     except InvalidTokenError as e:
@@ -141,7 +141,7 @@ async def get_user_id(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No token_payload provided or wrong token_payload type",
         )
-    if await is_token_revoked(session, token_payload.get("jti")):
+    if await is_token_revoked(session, token_payload.get("jti", "")):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Token revoked",
@@ -159,14 +159,14 @@ async def get_user_id(
     return int(user_id)
 
 
-def rate_limited(max_calls: int, time_frame: int):
-    def decorator(func):
+def rate_limited(max_calls: int, time_frame: int) -> Any:
+    def decorator(func: Any) -> Any:
         @wraps(func)
         async def wrapper(
             request: Request,
             session: AsyncSession,
             form_data: OAuth2PasswordRequestForm,
-        ):
+        ) -> Any:
             client_ip = request.client.host
             now = datetime.now()
             requests_data = RATE_LIMIT_DATA.get(client_ip, [])
