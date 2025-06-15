@@ -83,7 +83,7 @@ async def logout(
     else:
         await revoke_token(
             session=session,
-            token_jti=access_payload.get("jti"),
+            token_jti=access_payload.get("jti", ""),
             reason="user_logout",
         )
         message = "Logged out successfully"

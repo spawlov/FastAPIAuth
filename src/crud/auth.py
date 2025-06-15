@@ -124,7 +124,7 @@ async def revoke_token(
     session: AsyncSession,
     token_jti: str,
     reason: str = "user_logout",
-):
+) -> None:
     stmt = select(TokenBlacklist).where(TokenBlacklist.jti == token_jti)
     token = await session.scalar(stmt)
     if not token:
@@ -142,7 +142,7 @@ async def revoke_all_user_tokens(
     session: AsyncSession,
     user_id: int,
     reason: str = "user_logout",
-):
+) -> None:
     stmt = select(TokenBlacklist).where(TokenBlacklist.user_id == user_id)
     tokens = await session.scalars(stmt)
     if not tokens:
